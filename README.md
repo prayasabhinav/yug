@@ -148,6 +148,25 @@ predictor = YugPredictor.from_pretrained(
 forecasts = list(predictor.predict(dataset))
 ```
 
+### 5. Which way: up, down or flat
+
+*Added in this fork by Prayas Abhinav.* The model gives its band; plain code in
+[`src/yug/direction.py`](src/yug/direction.py) turns it into one answer per step,
+under a key a person writes. A step is up (`1`) when the whole band sits more
+than `margin` above the last observed value, down (`-1`) when it sits more than
+`margin` below, and flat (`0`) otherwise.
+
+```python
+from yug.direction import direction, read_key
+
+key = read_key("key.json")   # {"margin": 0.5, "lower": 0.1, "upper": 0.9}
+forecast = pipeline.predict(context=context, prediction_length=12, freq="M")
+direction(forecast, context[-1], key)   # e.g. [1, 1, 0, 0, ...]
+```
+
+`margin` is in the series' own units and is the key-writer's to set. Flat
+includes a band too wide to clear the margin either way.
+
 ---
 
 ## Examples
